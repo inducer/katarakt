@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-# Dependencies:
+# Dependencies (Debian/Ubuntu package names):
 #
-#   python-gobject2
-#   python-dbus
+#   python3-gi
+#   python3-dbus
 #
 
 # Thorsten Wißmann, 2015
@@ -47,14 +47,14 @@ Hint: VIM configuration:
 
   Add the following line to your vimrc:
 
-  au VimEnter *.tex execute "nmap ZE :! synctex-katarakt-vim " . v:servername . " 2>/dev/null >/dev/null  &<LEFT><LEFT>"
+  au BufRead *.tex execute "nmap ZE :! synctex-katarakt-vim " . v:servername . " 2>/dev/null >/dev/null  &<LEFT><LEFT>"
 
   When typing ZE the first time, it automatically calls this script, overwrites
   the ZE keybinding, and opens a katarakt instance. After typing ZE the first
   time, you are prompted such that you can specify an alternate PDF file. If
   you want an alternate vim keybinding (e.g. <Leader>f), add this line:
 
-  au VimEnter *.tex execute "nmap ZF :! VIM_KEY='ZF' synctex-katarakt-vim " . v:servername . " 2>/dev/null >/dev/null  &<LEFT><LEFT>"
+  au BufRead *.tex execute "nmap ZF :! VIM_KEY='ZF' synctex-katarakt-vim " . v:servername . " 2>/dev/null >/dev/null  &<LEFT><LEFT>"
 
   If your key contains something like <Leader> (or other keys containing "<"),
   escape it properly in the VIM_KEY= assignment.
@@ -63,7 +63,7 @@ Hint: VIM configuration:
 
 
 
-import gobject
+from gi.repository import GObject
 import sys
 import dbus
 import dbus.service
@@ -78,7 +78,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 # tell dbus that we use the gobject main loop
 
 DBusGMainLoop(set_as_default=True)
-loop = gobject.MainLoop()
+loop = GObject.MainLoop()
 
 
 #########################################
@@ -202,6 +202,6 @@ thread.start()
 
 # enable threads again, otherwise the quit_if_pdf_exits-thread will not be
 # executed
-gobject.threads_init()
+GObject.threads_init()
 loop.run()
 
