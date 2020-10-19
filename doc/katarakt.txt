@@ -249,6 +249,4 @@ AUTHOR
 
 RESOURCES
 ---------
-Gitweb: <http://git.cs.fau.de/?p=katarakt>
-
-Homepage: <http://git.cs.fau.de/~go18gomu/katarakt/>
+GitLab: <https://gitlab.cs.fau.de/Qui_Sum/katarakt>
