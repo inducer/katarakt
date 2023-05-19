@@ -6,6 +6,7 @@
 #include <QMutex>
 #include <QWidget>
 #include <QLineEdit>
+#include <QCheckBox>
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QRect>
@@ -64,6 +65,7 @@ protected:
 
 public slots:
 	void reset_search();
+	void set_use_regex(bool use_regex);
 
 private slots:
 	void insert_hits(int page, QList<QRectF> *hits);
@@ -76,6 +78,7 @@ private:
 	void shutdown();
 
 	QLineEdit *line;
+	QCheckBox *regex_box;
 	QLabel *progress;
 	QHBoxLayout *layout;
 

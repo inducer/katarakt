@@ -95,13 +95,11 @@ void SearchWorker::run() {
 		}
 
 		QString configuration_text;
-		if (use_regex) {
-			configuration_text = QString::fromUtf8("RegEx");
-		} else {
-			configuration_text = has_upper_case ? QString::fromUtf8("Case") : QString::fromUtf8("no case");
+		if (!use_regex) {
+			configuration_text = has_upper_case ? QString::fromUtf8("[Case] ") : QString::fromUtf8("[no case] ");
 		}
 
-		emit update_label_text(QString::fromUtf8("[%1] 0\% searched, 0 hits").arg(configuration_text));
+		emit update_label_text(QString::fromUtf8("%10\% searched, 0 hits").arg(configuration_text));
 
 		// search all pages
 		int hit_count = 0;
@@ -238,7 +236,7 @@ void SearchWorker::run() {
 				percent = start + bar->doc->numPages() - page;
 			}
 			percent = (percent % bar->doc->numPages()) * 100 / bar->doc->numPages();
-			QString progress = QString::fromUtf8("[%1] %2\% searched, %3 hits")
+			QString progress = QString::fromUtf8("%1%2\% searched, %3 hits")
 				.arg(configuration_text)
 				.arg(percent)
 				.arg(hit_count);
@@ -257,7 +255,7 @@ void SearchWorker::run() {
 #ifdef DEBUG
 		cerr << "done!" << endl;
 #endif
-		emit update_label_text(QString::fromUtf8("[%1] done, %2 hits")
+		emit update_label_text(QString::fromUtf8("%1done, %2 hits")
 				.arg(configuration_text)
 				.arg(hit_count));
 	}
@@ -271,14 +269,17 @@ SearchBar::SearchBar(const QString &file, Viewer *v, QWidget *parent) :
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	line = new QLineEdit(parent);
 
+	regex_box = new QCheckBox(QString::fromUtf8("RegEx"));
+	regex_box->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
 	progress = new QLabel(QString::fromUtf8("done."));
 	progress->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	layout = new QHBoxLayout();
 	layout->setContentsMargins(0, 0, 0, 0);
-	layout->setSpacing(0);
 	layout->addWidget(line);
 	layout->addWidget(progress);
+	layout->addWidget(regex_box);
 	setLayout(layout);
 
 	initialize(file, QByteArray());
@@ -307,8 +308,8 @@ void SearchBar::initialize(const QString &file, const QByteArray &password) {
 	worker = new SearchWorker(this);
 	worker->start();
 
-	connect(line, SIGNAL(returnPressed()), this, SLOT(set_text()),
-			Qt::UniqueConnection);
+	connect(line, SIGNAL(returnPressed()), this, SLOT(set_text()), Qt::UniqueConnection);
+	connect(regex_box, SIGNAL(toggled(bool)), this, SLOT(set_use_regex(bool)), Qt::UniqueConnection);
 	connect(worker, SIGNAL(update_label_text(const QString &)),
 			progress, SLOT(setText(const QString &)), Qt::UniqueConnection);
 	connect(worker, SIGNAL(search_done(int, QList<QRectF> *)),
@@ -347,6 +348,8 @@ bool SearchBar::is_valid() const {
 void SearchBar::focus(bool forward, bool use_regex) {
 	forward_tmp = forward; // only apply when the user presses enter
 	use_regex_tmp = use_regex;
+	regex_box->setChecked(use_regex_tmp);
+
 	line->activateWindow();
 	line->setText(term);
 	line->setFocus(Qt::OtherFocusReason);
@@ -380,6 +383,12 @@ void SearchBar::reset_search() {
 	viewer->get_canvas()->set_search_visible(false);
 	viewer->get_canvas()->setFocus(Qt::OtherFocusReason);
 	hide();
+}
+
+void SearchBar::set_use_regex(bool use_regex)
+{
+	use_regex_tmp = use_regex;
+	set_text();
 }
 
 void SearchBar::insert_hits(int page, QList<QRectF> *l) {
