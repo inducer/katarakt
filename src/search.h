@@ -41,6 +41,7 @@ signals:
 private:
 	SearchBar *bar;
 	bool forward;
+	bool use_regex;
 };
 
 
@@ -53,12 +54,9 @@ public:
 
 	void load(const QString &file, const QByteArray &password);
 	bool is_valid() const;
-	void focus(bool forward = true);
+	void focus(bool forward = true, bool use_regex = false);
 	const std::map<int,QList<QRectF> *> *get_hits() const;
 	bool is_search_forward() const;
-
-signals:
-	void search_updated(int page);
 
 protected:
 	// QT event handling
@@ -90,9 +88,11 @@ private:
 	QMutex term_mutex;
 	SearchWorker *worker;
 	QString term;
-	int start_page;
-	bool forward_tmp;
-	bool forward;
+	int start_page = 0;
+	bool forward_tmp = true;
+	bool forward = true;
+	bool use_regex_tmp = false;
+	bool use_regex = false;
 
 	friend class SearchWorker;
 };

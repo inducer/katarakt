@@ -75,6 +75,8 @@ private slots:
 	void quit();
 	void search();
 	void search_backward();
+	void regex_search();
+	void regex_search_backward();
 	void close_search();
 	void mark_jump();
 	void invert_colors();

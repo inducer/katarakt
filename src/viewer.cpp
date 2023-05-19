@@ -393,6 +393,15 @@ void Viewer::search_backward() {
 	search_bar->focus(false);
 }
 
+void Viewer::regex_search() {
+	search_bar->focus(true, true);
+}
+
+void Viewer::regex_search_backward()
+{
+	search_bar->focus(false, true);
+}
+
 void Viewer::next_hit() {
 	if (canvas->get_layout()->get_search_visible()) {
 		canvas->get_layout()->advance_hit();
@@ -584,6 +593,8 @@ void Viewer::setup_keys(QWidget *base) {
 	add_action(base, "Keys/quit", SLOT(quit()), this);
 	add_action(base, "Keys/search", SLOT(search()), this);
 	add_action(base, "Keys/search_backward", SLOT(search_backward()), this);
+	add_action(base, "Keys/regex_search", SLOT(regex_search()), this);
+	add_action(base, "Keys/regex_search_backward", SLOT(regex_search_backward()), this);
 	add_action(base, "Keys/close_search", SLOT(close_search()), this);
 	add_action(base, "Keys/mark_jump", SLOT(mark_jump()), this);
 	add_action(base, "Keys/invert_colors", SLOT(invert_colors()), this);

@@ -93,6 +93,8 @@ void CFG::init_defaults() {
 	default_key("Keys/smooth_right", "Right", "L");
 	default_key("Keys/search", "/");
 	default_key("Keys/search_backward", "?");
+	default_key("Keys/regex_search", "Ctrl+/");
+	default_key("Keys/regex_search_backward", "Ctrl+?");
 	default_key("Keys/next_hit", "N");
 	default_key("Keys/previous_hit", "Shift+N");
 	default_key("Keys/next_invisible_hit", "Ctrl+N");
