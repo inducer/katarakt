@@ -26,7 +26,7 @@ BeamerWindow::BeamerWindow(Viewer *v, QWidget *parent) :
 	switch (config->get_value("Settings/click_link_button").toInt()) {
 		case 1: click_link_button = Qt::LeftButton; break;
 		case 2: click_link_button = Qt::RightButton; break;
-		case 3: click_link_button = Qt::MidButton; break;
+		case 3: click_link_button = Qt::MiddleButton; break;
 		case 4: click_link_button = Qt::XButton1; break;
 		case 5: click_link_button = Qt::XButton2; break;
 		default: click_link_button = Qt::NoButton;
@@ -71,14 +71,14 @@ void BeamerWindow::paintEvent(QPaintEvent * /*event*/) {
 
 void BeamerWindow::mousePressEvent(QMouseEvent *event) {
 	if (click_link_button != Qt::NoButton && event->button() == click_link_button) {
-		mx_down = event->x();
-		my_down = event->y();
+		mx_down = event->position().x();
+		my_down = event->position().y();
 	}
 }
 
 void BeamerWindow::mouseReleaseEvent(QMouseEvent *event) {
 	if (click_link_button != Qt::NoButton && event->button() == click_link_button) {
-		if (mx_down == event->x() && my_down == event->y()) {
+		if (mx_down == event->position().x() && my_down == event->position().y()) {
 			pair<int, QPointF> location = layout->get_location_at(mx_down, my_down);
 			layout->activate_link(location.first, location.second.x(), location.second.y());
 		}
@@ -86,11 +86,14 @@ void BeamerWindow::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void BeamerWindow::wheelEvent(QWheelEvent *event) {
-	int d = event->delta();
 	if (QApplication::keyboardModifiers() == Qt::NoModifier) {
-		if (event->orientation() == Qt::Vertical) {
-			viewer->get_canvas()->get_layout()->scroll_page(-d / mouse_wheel_factor);
-		}
+		// TODO unsure if pixelDelta should be used, documentation says it is unreliable on X11
+		// on my laptop angleDelta returns small increments when using the touchpad
+		// we want to scroll whole pages here -> accumulate deltas
+		static int remainder;
+		remainder -= event->angleDelta().y();
+		viewer->get_canvas()->get_layout()->scroll_page(remainder / mouse_wheel_factor);
+		remainder %= mouse_wheel_factor;
 	}
 }
 

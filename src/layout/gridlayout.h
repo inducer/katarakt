@@ -1,5 +1,4 @@
-#ifndef GRIDLAYOUT_H
-#define GRIDLAYOUT_H
+#pragma once
 
 #include "layout.h"
 
@@ -66,7 +65,3 @@ private:
 	int border_page_w, border_off_w;
 	int border_page_h, border_off_h;
 };
-
-
-#endif
-

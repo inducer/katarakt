@@ -43,9 +43,9 @@ const QRect SingleLayout::calculate_placement(int page) const {
 void SingleLayout::render(QPainter *painter) {
 	const QRect p = calculate_placement(page);
 	const KPage *k_page = res->get_page(page, p.width(), render_index);
-	if (k_page != NULL) {
+	if (k_page != nullptr) {
 		const QImage *img = k_page->get_image();
-		if (img != NULL) {
+		if (img != nullptr) {
 			int rot = (res->get_rotation() - k_page->get_rotation() + 4) % 4;
 			QRect rect;
 			painter->rotate(rot * 90);
@@ -86,7 +86,7 @@ void SingleLayout::render(QPainter *painter) {
 
 	// draw goto link rects
 /*	const list<Poppler::LinkGoto *> *l = res->get_links(page);
-	if (l != NULL) {
+	if (l != nullptr) {
 		painter->setPen(QColor(0, 0, 255));
 		painter->setBrush(QColor(0, 0, 255, 64));
 		for (list<Poppler::LinkGoto *>::const_iterator it = l->begin();
@@ -104,11 +104,11 @@ void SingleLayout::render(QPainter *painter) {
 	// prefetch
 	for (int count = 1; count <= prefetch_count; count++) {
 		// after current page
-		if (res->get_page(page + count, calculate_fit_width(page + count), render_index) != NULL) {
+		if (res->get_page(page + count, calculate_fit_width(page + count), render_index) != nullptr) {
 			res->unlock_page(page + count);
 		}
 		// before current page
-		if (res->get_page(page - count, calculate_fit_width(page - count), render_index) != NULL) {
+		if (res->get_page(page - count, calculate_fit_width(page - count), render_index) != nullptr) {
 			res->unlock_page(page - count);
 		}
 	}

@@ -1,8 +1,7 @@
 #include <QAction>
 #include <QObject>
 #include <QImage>
-//#include <QTime>
-//#include <iostream>
+#include <QWidget>
 #include "util.h"
 #include "config.h"
 

@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include <QSettings>
 #include <QVector>
@@ -49,6 +48,3 @@ public:
 
 	QStringList get_keys(const char *action) const;
 };
-
-#endif
-

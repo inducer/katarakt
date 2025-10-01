@@ -369,9 +369,9 @@ void GridLayout::render(QPainter *painter) {
 			int center_y = (grid_height - page_height) / 2;
 
 			const KPage *k_page = res->get_page(last_page, page_width, render_index);
-			if (k_page != NULL) {
+			if (k_page != nullptr) {
 				const QImage *img = k_page->get_image();
-				if (img != NULL) {
+				if (img != nullptr) {
 					int rot = (res->get_rotation() - k_page->get_rotation() + 4) % 4;
 					QRect rect;
 					painter->rotate(rot * 90);
@@ -428,12 +428,12 @@ void GridLayout::render(QPainter *painter) {
 	for (int count = 0; count < prefetch_count; count++) {
 		// after last visible page
 		int page_width = res->get_page_width(prefetch_last + count) * size;
-		if (res->get_page(prefetch_last + count, page_width, render_index) != NULL) {
+		if (res->get_page(prefetch_last + count, page_width, render_index) != nullptr) {
 			res->unlock_page(prefetch_last + count);
 		}
 		// before first visible page
 		page_width = res->get_page_width(prefetch_first + count) * size;
-		if (res->get_page(prefetch_first + count, page_width, render_index) != NULL) {
+		if (res->get_page(prefetch_first + count, page_width, render_index) != nullptr) {
 			res->unlock_page(prefetch_first + count);
 		}
 	}

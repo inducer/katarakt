@@ -36,15 +36,15 @@ int main(int argc, char *argv[]) {
 
 	// parse command line options
 	struct option long_options[] = {
-		{"url",						no_argument,		NULL,	'u'},
-		{"page",					required_argument,	NULL,	'p'},
-		{"fullscreen",				no_argument,		NULL,	'f'},
-		{"quit",					required_argument,	NULL,	'q'},
-		{"single-instance",			required_argument,	NULL,	's'},
-		{"write-default-config",	required_argument,	NULL,	0},
-		{"help",					no_argument,		NULL,	'h'},
-		{"version",					no_argument,		NULL,	'v'},
-		{NULL, 0, NULL, 0}
+		{"url",						no_argument,		nullptr,	'u'},
+		{"page",					required_argument,	nullptr,	'p'},
+		{"fullscreen",				no_argument,		nullptr,	'f'},
+		{"quit",					required_argument,	nullptr,	'q'},
+		{"single-instance",			required_argument,	nullptr,	's'},
+		{"write-default-config",	required_argument,	nullptr,	0},
+		{"help",					no_argument,		nullptr,	'h'},
+		{"version",					no_argument,		nullptr,	'v'},
+		{nullptr, 0, nullptr, 0}
 	};
 	int option_index = 0;
 	bool download_url = false;
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
 
 	QString file;
 	Download download;
-	if (argv[optind] != NULL) {
+	if (argv[optind] != nullptr) {
 		if (download_url) {
 			file = download.load(QString::fromLocal8Bit(argv[optind]));
 		} else {

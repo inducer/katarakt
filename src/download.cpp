@@ -12,8 +12,7 @@ using namespace std;
 
 
 Download::Download() :
-	manager(new QNetworkAccessManager()),
-	file(NULL) {
+	manager(new QNetworkAccessManager()) {
 }
 
 Download::~Download() {

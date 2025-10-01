@@ -1,5 +1,4 @@
-#ifndef WORKER_H
-#define WORKER_H
+#pragma once
 
 #include <QThread>
 
@@ -27,6 +26,3 @@ private:
 	bool smooth_downscaling;
 	int thumbnail_size;
 };
-
-#endif
-

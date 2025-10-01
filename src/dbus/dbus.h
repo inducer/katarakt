@@ -1,5 +1,4 @@
-#ifndef DBUS_H
-#define DBUS_H
+#pragma once
 
 #include <QString>
 class Viewer;
@@ -19,5 +18,3 @@ void dbus_init(Viewer *viewer);
  * This method works without dbus_init() being called before!
  */
 bool activate_katarakt_with_file(QString file);
-
-#endif /* DBUS_H */

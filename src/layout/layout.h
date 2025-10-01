@@ -1,14 +1,9 @@
-#ifndef LAYOUT_H
-#define LAYOUT_H
+#pragma once
 
 #include <QPainter>
 #include <QList>
 #include <QClipboard>
-#if QT_VERSION >= 0x050000
-#	include <poppler-qt5.h>
-#else
-#	include <poppler-qt4.h>
-#endif
+#include <poppler-qt6.h>
 #include <map>
 #include "../selection.h"
 
@@ -101,7 +96,3 @@ protected:
 
 	MouseSelection selection;
 };
-
-
-#endif
-

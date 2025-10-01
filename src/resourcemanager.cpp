@@ -59,11 +59,10 @@ void Request::update(int width, int index) {
 ResourceManager::ResourceManager(const QString &file, Viewer *v) :
 		viewer(v),
 		file(file),
-		doc(NULL),
 		center_page(0),
 		rotation(0),
 #ifdef __linux__
-		i_notifier(NULL),
+		i_notifier(nullptr),
 #endif
 		inverted_colors(false),
 		cur_jump_pos(jumplist.end()) {
@@ -72,15 +71,15 @@ ResourceManager::ResourceManager(const QString &file, Viewer *v) :
 
 void ResourceManager::initialize(const QString &file, const QByteArray &password) {
 	page_count = 0;
-	k_page = NULL;
+	k_page = nullptr;
 
-	doc = NULL;
+	doc.reset();
 	if (!file.isNull()) {
 		doc = Poppler::Document::load(file, QByteArray(), password);
 	}
 
 	worker = new Worker(this);
-	if (viewer->get_canvas() != NULL) {
+	if (viewer->get_canvas() != nullptr) {
 		// on first start the canvas has not yet been constructed
 		connect(worker, SIGNAL(page_rendered(int)), viewer->get_canvas(), SLOT(page_rendered(int)), Qt::UniqueConnection);
 		connect(worker, SIGNAL(page_rendered(int)), viewer->get_beamer(), SLOT(page_rendered(int)), Qt::UniqueConnection);
@@ -105,7 +104,7 @@ void ResourceManager::initialize(const QString &file, const QByteArray &password
 	}
 #endif
 
-	if (doc == NULL) {
+	if (!doc) {
 		// poppler already prints a debug message
 //		cerr << "failed to open file" << endl;
 		return;
@@ -135,8 +134,8 @@ void ResourceManager::initialize(const QString &file, const QByteArray &password
 
 	k_page = new KPage[get_page_count()];
 	for (int i = 0; i < get_page_count(); i++) {
-		Poppler::Page *p = doc->page(i);
-		if (p == NULL) {
+		auto p = doc->page(i);
+		if (!p) {
 			cerr << "failed to load page " << i << endl;
 			continue;
 		}
@@ -155,7 +154,6 @@ void ResourceManager::initialize(const QString &file, const QByteArray &password
 //		if (k_page[i].label != QString::number(i + 1)) {
 //			cout << i << endl;
 //		}
-		delete p;
 	}
 }
 
@@ -164,7 +162,7 @@ ResourceManager::~ResourceManager() {
 }
 
 void ResourceManager::shutdown() {
-	if (worker != NULL) {
+	if (worker != nullptr) {
 		join_threads();
 	}
 	garbageMutex.lock();
@@ -177,9 +175,8 @@ void ResourceManager::shutdown() {
 #ifdef __linux__
 	::close(inotify_fd);
 	delete i_notifier;
-	i_notifier = NULL;
+	i_notifier = nullptr;
 #endif
-	delete doc;
 	delete[] k_page;
 	delete worker;
 }
@@ -190,11 +187,11 @@ void ResourceManager::load(const QString &file, const QByteArray &password) {
 }
 
 bool ResourceManager::is_valid() const {
-	return (doc != NULL);
+	return (doc != nullptr);
 }
 
 bool ResourceManager::is_locked() const {
-	if (doc == NULL) {
+	if (doc == nullptr) {
 		return false;
 	}
 	return doc->isLocked();
@@ -210,7 +207,7 @@ void ResourceManager::set_file(const QString &new_file) {
 
 const KPage *ResourceManager::get_page(int page, int width, int index) {
 	if (page < 0 || page >= get_page_count()) {
-		return NULL;
+		return nullptr;
 	}
 
 	// page not available or wrong size/rotation/color
@@ -350,7 +347,7 @@ int ResourceManager::jump_forward() {
 	return *cur_jump_pos;
 }
 
-Poppler::LinkDestination *ResourceManager::resolve_link_destination(const QString &name) const {
+std::unique_ptr<Poppler::LinkDestination> ResourceManager::resolve_link_destination(const QString &name) const {
 	return doc->linkDestination(name);
 }
 
@@ -456,19 +453,18 @@ int ResourceManager::get_page_count() const {
 	return page_count;
 }
 
-const QList<Poppler::Link *> *ResourceManager::get_links(int page) {
+const std::vector<std::unique_ptr<Poppler::Link>> &ResourceManager::get_links(int page) {
 	if (page < 0 || page >= get_page_count()) {
-		return NULL;
+		static std::vector<std::unique_ptr<Poppler::Link>> empty;
+		return empty;
 	}
-	link_mutex.lock();
-	QList<Poppler::Link *> *l = k_page[page].links;
-	link_mutex.unlock();
-	return l;
+
+	return k_page[page].links;
 }
 
 const QList<SelectionLine *> *ResourceManager::get_text(int page) {
 	if (page < 0 || page >= get_page_count()) {
-		return NULL;
+		return nullptr;
 	}
 	link_mutex.lock();
 	QList<SelectionLine *> *t = k_page[page].text;
@@ -476,11 +472,13 @@ const QList<SelectionLine *> *ResourceManager::get_text(int page) {
 	return t;
 }
 
-QDomDocument *ResourceManager::get_toc() const {
-	if (doc == NULL || doc->isLocked()) {
-		return NULL;
+QVector<Poppler::OutlineItem> ResourceManager::get_outline() const {
+	if (doc == nullptr || doc->isLocked()) {
+		static QVector<Poppler::OutlineItem> empty;
+		return empty;
 	}
-	return doc->toc();
+
+	return doc->outline();
 }
 
 void ResourceManager::join_threads() {

@@ -1,5 +1,4 @@
-#ifndef GRID_H
-#define GRID_H
+#pragma once
 
 
 class ResourceManager;
@@ -24,12 +23,9 @@ private:
 
 	ResourceManager *res;
 
-	int column_count;
-	int row_count;
-	float *width;
-	float *height;
-	int page_offset;
+	int column_count = -1;
+	int row_count = 0;
+	float *width = nullptr;
+	float *height = nullptr;
+	int page_offset = 0;
 };
-
-#endif
-

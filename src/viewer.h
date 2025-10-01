@@ -1,5 +1,4 @@
-#ifndef VIEWER_H
-#define VIEWER_H
+#pragma once
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -119,6 +118,3 @@ private:
 
 	bool valid;
 };
-
-#endif
-

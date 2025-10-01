@@ -1,12 +1,10 @@
-#ifndef TOC_H
-#define TOC_H
+#pragma once
 
 #include <QTreeWidget>
 
 
-class QDomDocument;
-class QDomNode;
 class Viewer;
+namespace Poppler { class OutlineItem; }
 
 
 class Toc : public QTreeWidget {
@@ -26,10 +24,7 @@ protected:
 
 private:
 	void shutdown();
-	void build(QDomNode *node, QTreeWidgetItem *parent);
+        void build(const QVector<Poppler::OutlineItem> &items, QTreeWidgetItem *parent);
 
 	Viewer *viewer;
 };
-
-#endif
-

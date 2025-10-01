@@ -1,10 +1,8 @@
 #include <QAction>
-#include <QStringListIterator>
 #include <QKeySequence>
 #include <QString>
 #include <QPainter>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QTimer>
 #include <QLabel>
 #include <iostream>
@@ -58,7 +56,7 @@ Canvas::Canvas(Viewer *v, QWidget *parent) :
 	switch (config->get_value("Settings/click_link_button").toInt()) {
 		case 1: click_link_button = Qt::LeftButton; break;
 		case 2: click_link_button = Qt::RightButton; break;
-		case 3: click_link_button = Qt::MidButton; break;
+		case 3: click_link_button = Qt::MiddleButton; break;
 		case 4: click_link_button = Qt::XButton1; break;
 		case 5: click_link_button = Qt::XButton2; break;
 		default: click_link_button = Qt::NoButton;
@@ -67,7 +65,7 @@ Canvas::Canvas(Viewer *v, QWidget *parent) :
 	switch (config->get_value("Settings/drag_view_button").toInt()) {
 		case 1: drag_view_button = Qt::LeftButton; break;
 		case 2: drag_view_button = Qt::RightButton; break;
-		case 3: drag_view_button = Qt::MidButton; break;
+		case 3: drag_view_button = Qt::MiddleButton; break;
 		case 4: drag_view_button = Qt::XButton1; break;
 		case 5: drag_view_button = Qt::XButton2; break;
 		default: drag_view_button = Qt::NoButton;
@@ -76,7 +74,7 @@ Canvas::Canvas(Viewer *v, QWidget *parent) :
 	switch (config->get_value("Settings/select_text_button").toInt()) {
 		case 1: select_text_button = Qt::LeftButton; break;
 		case 2: select_text_button = Qt::RightButton; break;
-		case 3: select_text_button = Qt::MidButton; break;
+		case 3: select_text_button = Qt::MiddleButton; break;
 		case 4: select_text_button = Qt::XButton1; break;
 		case 5: select_text_button = Qt::XButton2; break;
 		default: select_text_button = Qt::NoButton;
@@ -196,8 +194,8 @@ void Canvas::paintEvent(QPaintEvent * /*event*/) {
 void Canvas::mousePressEvent(QMouseEvent *event) {
 	if ((click_link_button != Qt::NoButton && event->button() == click_link_button)
 			|| (drag_view_button != Qt::NoButton && event->button() == drag_view_button)) {
-		mx = event->x();
-		my = event->y();
+		mx = event->position().x();
+		my = event->position().y();
 		mx_down = mx;
 		my_down = my;
 	}
@@ -209,10 +207,10 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
 	}
 	if (select_text_button != Qt::NoButton && event->button() == select_text_button) {
 		if (triple_click_possible) {
-			cur_layout->select(event->x(), event->y(), Selection::StartLine);
+			cur_layout->select(event->position().x(), event->position().y(), Selection::StartLine);
 			triple_click_possible = false;
 		} else {
-			cur_layout->select(event->x(), event->y(), Selection::Start);
+			cur_layout->select(event->position().x(), event->position().y(), Selection::Start);
 		}
 
 		if (cursor().shape() != Qt::PointingHandCursor) { // TODO
@@ -225,14 +223,14 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
 	if (event->button() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier) {
 		// emit synctex signal
-		pair<int, QPointF> location = cur_layout->get_location_at(event->x(), event->y());
+		pair<int, QPointF> location = cur_layout->get_location_at(event->position().x(), event->position().y());
 		// scale from [0,1] to points
 		location.second.rx() *= viewer->get_res()->get_page_width(location.first, false);
 		location.second.ry() *= viewer->get_res()->get_page_height(location.first, false);
 
 		emit synchronize_editor(location.first, (int) ROUND(location.second.x()), (int) ROUND(location.second.y()));
 	} else if (click_link_button != Qt::NoButton && event->button() == click_link_button) {
-		if (mx_down == event->x() && my_down == event->y()) {
+		if (mx_down == event->position().x() && my_down == event->position().y()) {
 			pair<int, QPointF> location = cur_layout->get_location_at(mx_down, my_down);
 			cur_layout->activate_link(location.first, location.second.x(), location.second.y());
 		}
@@ -261,9 +259,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
 
 void Canvas::mouseMoveEvent(QMouseEvent *event) {
 	if (drag_view_button != Qt::NoButton && event->buttons() & drag_view_button) {
-		cur_layout->scroll_smooth(event->x() - mx, event->y() - my);
-		mx = event->x();
-		my = event->y();
+		cur_layout->scroll_smooth(event->position().x() - mx, event->position().y() - my);
+		mx = event->position().x();
+		my = event->position().y();
 
 		// wrap mouse around when dragging at the border
 		if (mx <= 0) {
@@ -293,22 +291,22 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
 		}
 	}
 	if (select_text_button != Qt::NoButton && event->buttons() & select_text_button) {
-		cur_layout->select(event->x(), event->y(), Selection::End);
+		cur_layout->select(event->position().x(), event->position().y(), Selection::End);
 
 		// scrolling by dragging the selection
 		// TODO only scrolls when the mouse is moved
 		int margin = min(10, min(width() / 10, height() / 10));
-		if (event->x() < margin) {
-			cur_layout->scroll_smooth(min(margin - event->x(), margin) * 2, 0);
+		if (event->position().x() < margin) {
+			cur_layout->scroll_smooth(min(margin - static_cast<int>(event->position().x()), margin) * 2, 0);
 		}
-		if (event->x() > width() - margin) {
-			cur_layout->scroll_smooth(max(width() - event->x() - margin, -margin) * 2, 0);
+		if (event->position().x() > width() - margin) {
+			cur_layout->scroll_smooth(max(width() - static_cast<int>(event->position().x()) - margin, -margin) * 2, 0);
 		}
-		if (event->y() < margin) {
-			cur_layout->scroll_smooth(0, min(margin - event->y(), margin) * 2);
+		if (event->position().y() < margin) {
+			cur_layout->scroll_smooth(0, min(margin - static_cast<int>(event->position().y()), margin) * 2);
 		}
-		if (event->y() > height() - margin) {
-			cur_layout->scroll_smooth(0, max(height() - event->y() - margin, -margin) * 2);
+		if (event->position().y() > height() - margin) {
+			cur_layout->scroll_smooth(0, max(height() - static_cast<int>(event->position().y()) - margin, -margin) * 2);
 		}
 	}
 
@@ -328,38 +326,43 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void Canvas::wheelEvent(QWheelEvent *event) {
-	int d = event->delta();
+	// TODO unsure if pixelDelta should be used, documentation says it is unreliable on X11
 	switch (QApplication::keyboardModifiers()) {
 		// scroll
 		case Qt::NoModifier:
-			if (event->orientation() == Qt::Vertical) {
-				if (cur_layout->supports_smooth_scrolling()) {
-					cur_layout->scroll_smooth(0, d);
-				} else {
-					cur_layout->scroll_page(-d / mouse_wheel_factor);
-				}
+			if (cur_layout->supports_smooth_scrolling()) {
+				cur_layout->scroll_smooth(event->angleDelta().x(), event->angleDelta().y());
 			} else {
-				cur_layout->scroll_smooth(d, 0);
+				// on my laptop angleDelta returns small increments when using the touchpad
+				// we want to scroll whole pages here -> accumulate deltas
+				static int remainder;
+				remainder -= event->angleDelta().y();
+				cur_layout->scroll_page(remainder / mouse_wheel_factor);
+				remainder %= mouse_wheel_factor;
 			}
 			break;
 
 		// zoom
-		case Qt::ControlModifier:
-			cur_layout->set_zoom(d / mouse_wheel_factor);
+		case Qt::ControlModifier: {
+			static int remainder;
+			remainder += event->angleDelta().y();
+			cur_layout->set_zoom(remainder / mouse_wheel_factor);
+			remainder %= mouse_wheel_factor;
 			break;
+		}
 	}
 }
 
-void Canvas::mouseDoubleClickEvent(QMouseEvent * event) {
+void Canvas::mouseDoubleClickEvent(QMouseEvent *event) {
 	if (drag_view_button != Qt::NoButton && event->button() == drag_view_button) {
-		cur_layout->goto_page_at(event->x(), event->y());
+		cur_layout->goto_page_at(event->position().x(), event->position().y());
 	}
 	if (select_text_button != Qt::NoButton && event->button() == select_text_button) {
 		// enable triple click, disable after timeout
 		triple_click_possible = true;
 		QTimer::singleShot(QApplication::doubleClickInterval(), this, SLOT(disable_triple_click()));
 
-		cur_layout->select(event->x(), event->y(), Selection::StartWord);
+		cur_layout->select(event->position().x(), event->position().y(), Selection::StartWord);
 	}
 }
 

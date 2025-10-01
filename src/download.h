@@ -1,5 +1,4 @@
-#ifndef DOWNLOAD_H
-#define DOWNLOAD_H
+#pragma once
 
 #include <QString>
 #include <QNetworkAccessManager>
@@ -20,8 +19,5 @@ private slots:
 
 private:
 	QNetworkAccessManager *manager;
-	QTemporaryFile *file;
+	QTemporaryFile *file = nullptr;
 };
-
-#endif
-

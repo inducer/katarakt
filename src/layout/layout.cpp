@@ -293,7 +293,7 @@ void Layout::render_selection(QPainter *painter, int cur_page, QPoint offset, fl
 	painter->setBrush(color);
 
 	const QList<SelectionLine *> *text = res->get_text(cur_page);
-	if (text != NULL && text->size() != 0 && selection.is_active()) {
+	if (text != nullptr && text->size() != 0 && selection.is_active()) {
 		Cursor from = selection.get_cursor(true);
 		Cursor to = selection.get_cursor(false);
 		if (from.page <= cur_page && to.page >= cur_page) {
@@ -338,33 +338,41 @@ void Layout::view_hit() {
 
 void Layout::activate_link(int page, float x, float y) {
 	// find matching box
-	const QList<Poppler::Link *> *links = res->get_links(page);
-	if (links == NULL) {
+	const auto &links = res->get_links(page);
+	if (links.empty()) {
 		return;
 	}
-	Q_FOREACH(Poppler::Link *l, *links) {
+	for (const auto &l : links) {
 		QRectF r = l->linkArea();
 		if (x >= r.left() && x < r.right()) {
 			if (y < r.top() && y >= r.bottom()) {
 				switch (l->linkType()) {
 					case Poppler::Link::Goto: {
-						Poppler::LinkGoto *link = static_cast<Poppler::LinkGoto *>(l);
+						Poppler::LinkGoto *link = static_cast<Poppler::LinkGoto *>(l.get());
 						// TODO support links to other files
 						goto_link_destination(link->destination());
 						return;
 					}
 					case Poppler::Link::Browse: {
-						Poppler::LinkBrowse *link = static_cast<Poppler::LinkBrowse *>(l);
+						Poppler::LinkBrowse *link = static_cast<Poppler::LinkBrowse *>(l.get());
 						QDesktopServices::openUrl(QUrl(link->url()));
 						break;
 					}
+					case Poppler::Link::None:
 					case Poppler::Link::Execute:
 					case Poppler::Link::Action:
 					case Poppler::Link::Sound:
 					case Poppler::Link::Movie:
 					case Poppler::Link::Rendition:
 					case Poppler::Link::JavaScript:
-					case Poppler::Link::None:
+					case Poppler::Link::OCGState:
+					case Poppler::Link::Hide:
+#if POPPLER_VERSION >= POPPLER_VERSION_CHECK(24, 7, 0)
+					case Poppler::Link::ResetForm:
+#endif
+#if POPPLER_VERSION >= POPPLER_VERSION_CHECK(24, 10, 0)
+					case Poppler::Link::SubmitForm:
+#endif
 						cerr << "link type not implemented (yet?)" << endl;
 				}
 			}

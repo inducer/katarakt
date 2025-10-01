@@ -7,8 +7,6 @@ using namespace std;
 
 Grid::Grid(ResourceManager *_res, int columns, int offset) :
 		res(_res),
-		column_count(-1),
-		width(NULL), height(NULL),
 		page_offset(offset) {
 	set_columns(columns);
 }

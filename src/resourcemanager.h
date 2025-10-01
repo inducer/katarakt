@@ -1,5 +1,4 @@
-#ifndef RESOURCEMANAGER_H
-#define RESOURCEMANAGER_H
+#pragma once
 
 #include <QObject>
 #include <QString>
@@ -7,11 +6,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QSemaphore>
-#if QT_VERSION >= 0x050000
-#	include <poppler-qt5.h>
-#else
-#	include <poppler-qt4.h>
-#endif
+#include <poppler-qt6.h>
 #include <list>
 #include <set>
 
@@ -22,7 +17,6 @@ class KPage;
 class Worker;
 class Viewer;
 class QSocketNotifier;
-class QDomDocument;
 class SelectionLine;
 
 
@@ -63,9 +57,9 @@ public:
 	float get_min_aspect(bool rotated = true) const;
 	float get_max_aspect(bool rotated = true) const;
 	int get_page_count() const;
-	const QList<Poppler::Link *> *get_links(int page);
+	const std::vector<std::unique_ptr<Poppler::Link>> &get_links(int page);
 	const QList<SelectionLine *> *get_text(int page);
-	QDomDocument *get_toc() const;
+	QVector<Poppler::OutlineItem> get_outline() const;
 
 	int get_rotation() const;
 	void rotate(int value, bool relative = true);
@@ -82,7 +76,7 @@ public:
 	int jump_back();
 	int jump_forward();
 
-	Poppler::LinkDestination *resolve_link_destination(const QString &name) const;
+	std::unique_ptr<Poppler::LinkDestination> resolve_link_destination(const QString &name) const;
 
 public slots:
 	void inotify_slot();
@@ -100,7 +94,7 @@ private:
 	Viewer *viewer;
 
 	QString file;
-	Poppler::Document *doc;
+	std::unique_ptr<Poppler::Document> doc;
 	QMutex requestMutex;
 	QMutex garbageMutex;
 	QSemaphore requestSemaphore;
@@ -130,6 +124,3 @@ private:
 	std::map<int,std::list<int>::iterator> jump_map;
 	std::list<int>::iterator cur_jump_pos;
 };
-
-#endif
-

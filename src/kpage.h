@@ -1,13 +1,8 @@
-#ifndef KPAGE_H
-#define KPAGE_H
+#pragma once
 
 #include <QImage>
 #include <QMutex>
-#if QT_VERSION >= 0x050000
-#	include <poppler-qt5.h>
-#else
-#	include <poppler-qt4.h>
-#endif
+#include <poppler-qt6.h>
 
 
 class SelectionLine;
@@ -39,16 +34,19 @@ private:
 	QImage thumbnail_other;
 
 //	QString label;
-	QList<Poppler::Link *> *links;
+	bool links_initialized = false;
+	std::vector<std::unique_ptr<Poppler::Link>> links;
+
 	QMutex mutex;
 	int status[3];
 	char rotation[3];
-	bool inverted_colors; // img[]s and thumb must be consistent
-	QList<SelectionLine *> *text;
+	bool inverted_colors = false; // img[]s and thumb must be consistent
+
+	// this variable is for memory management of TextBoxes
+	// this way the SelectionLines can work with poppler-qt6 with minimal changes
+	std::vector<std::unique_ptr<Poppler::TextBox>> text_boxes;
+	QList<SelectionLine *> *text = nullptr;
 
 	friend class Worker;
 	friend class ResourceManager;
 };
-
-#endif
-

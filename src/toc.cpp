@@ -1,8 +1,7 @@
 #include <QEvent>
 #include <QKeyEvent>
-#include <QDomDocument>
-#include <QDomNode>
 #include <QHeaderView>
+#include <poppler-qt6.h>
 #include "toc.h"
 #include "viewer.h"
 #include "canvas.h"
@@ -11,7 +10,7 @@
 #include "util.h"
 
 
-Q_DECLARE_METATYPE(Poppler::LinkDestination *)
+Q_DECLARE_METATYPE(Poppler::LinkDestination)
 
 
 Toc::Toc(Viewer *v, QWidget *parent) :
@@ -20,13 +19,8 @@ Toc::Toc(Viewer *v, QWidget *parent) :
 
 	QHeaderView *h = header();
 	h->setStretchLastSection(false);
-#if QT_VERSION >= 0x050000
 	h->setSectionResizeMode(0, QHeaderView::Stretch);
 	h->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-#else
-	h->setResizeMode(0, QHeaderView::Stretch);
-	h->setResizeMode(1, QHeaderView::ResizeToContents);
-#endif
 
 	QStringList list = QStringList() << QString::fromUtf8("Contents") << QString();
 	setHeaderLabels(list);
@@ -41,11 +35,8 @@ Toc::Toc(Viewer *v, QWidget *parent) :
 void Toc::init() {
 	shutdown();
 
-	QDomDocument *contents = viewer->get_res()->get_toc();
-	if (contents != NULL) {
-		build(contents, invisibleRootItem());
-		delete contents;
-	}
+	auto outline = viewer->get_res()->get_outline();
+	build(outline, invisibleRootItem());
 
 	// indicate empty toc
 	if (topLevelItemCount() == 0) {
@@ -59,12 +50,6 @@ Toc::~Toc() {
 }
 
 void Toc::shutdown() {
-	QTreeWidgetItemIterator it(this);
-	while (*it) {
-		delete (*it)->data(0, Qt::UserRole).value<Poppler::LinkDestination *>();
-		++it;
-	}
-
 	clear();
 }
 
@@ -77,7 +62,7 @@ void Toc::goto_link(QTreeWidgetItem *item, int column) {
 		return;
 	}
 
-	Poppler::LinkDestination *link = item->data(0, Qt::UserRole).value<Poppler::LinkDestination *>();
+	auto link = item->data(0, Qt::UserRole).value<QSharedPointer<const Poppler::LinkDestination>>();
 	viewer->get_canvas()->get_layout()->goto_link_destination(*link);
 	viewer->get_canvas()->setFocus(Qt::OtherFocusReason);
 }
@@ -110,43 +95,26 @@ bool Toc::event(QEvent *e) {
 	return QTreeWidget::event(e);
 }
 
-void Toc::build(QDomNode *node, QTreeWidgetItem *parent) {
-	if (node->isNull() || !node->hasChildNodes()) {
+void Toc::build(const QVector<Poppler::OutlineItem> &items, QTreeWidgetItem *parent) {
+	if (items.empty()) {
 		return;
 	}
 
-	QDomNodeList list = node->childNodes();
-	for (int i = 0; i < list.count(); i++) {
-		QDomNode n = list.at(i);
-
+	for (const auto &outlineItem : items) {
 		QStringList strings;
-		strings << n.nodeName();
-		QDomNamedNodeMap attributes = n.attributes();
-		QDomNode dest = attributes.namedItem(QString::fromUtf8("Destination"));
-		Poppler::LinkDestination *link = NULL;
-		if (!dest.isNull()) {
-//			strings << dest.nodeValue();
-			link = new Poppler::LinkDestination(dest.nodeValue());
-		} else {
-			dest = attributes.namedItem(QString::fromUtf8("DestinationName"));
-			if (!dest.isNull()) {
-				link = viewer->get_res()->resolve_link_destination(dest.nodeValue());
-//				if (dest_page >= 0) {
-//					strings << QString::number(dest_page);
-//				}
-			}
-		}
-		if (!dest.isNull() && link != NULL) {
-			strings << QString::number(link->pageNumber());
+		strings << outlineItem.name();
+
+		const auto &destination = outlineItem.destination();
+		if (!destination.isNull()) {
+			strings << QString::number(destination->pageNumber());
 		}
 		// TODO check "ExternalFileName"
 		// TODO take "Open" into account?
+		QTreeWidgetItem *treeItem = new QTreeWidgetItem(parent, strings);
+		treeItem->setTextAlignment(1, Qt::AlignRight);
+		treeItem->setData(0, Qt::UserRole, QVariant::fromValue(destination));
 
-		QTreeWidgetItem *item = new QTreeWidgetItem(parent, strings);
-		item->setTextAlignment(1, Qt::AlignRight);
-		item->setData(0, Qt::UserRole, QVariant::fromValue(link));
-
-		build(&n, item);
+		build(outlineItem.children(), treeItem);
 	}
 }
 

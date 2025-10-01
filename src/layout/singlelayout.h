@@ -1,5 +1,4 @@
-#ifndef SINGLELAYOUT_H
-#define SINGLELAYOUT_H
+#pragma once
 
 #include "layout.h"
 
@@ -21,6 +20,3 @@ public:
 private:
 	int calculate_fit_width(int page) const;
 };
-
-#endif
-

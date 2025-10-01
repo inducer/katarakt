@@ -8,15 +8,6 @@ SelectionPart::SelectionPart(Poppler::TextBox *box) :
 	bbox = text_box->boundingBox();
 }
 
-SelectionPart::~SelectionPart() {
-	Poppler::TextBox *next;
-	do {
-		next = text_box->nextWord();
-		delete text_box;
-		text_box = next;
-	} while (next != NULL);
-}
-
 void SelectionPart::add_word(Poppler::TextBox *box) {
 	bbox = bbox.united(box->boundingBox());
 }
@@ -119,7 +110,7 @@ void Cursor::find_word(const Poppler::TextBox *text_box, bool from, enum Selecti
 				break;
 			}
 
-			if (next->nextWord() == NULL) {
+			if (next->nextWord() == nullptr) {
 				break;
 			}
 			next = next->nextWord();
@@ -127,7 +118,7 @@ void Cursor::find_word(const Poppler::TextBox *text_box, bool from, enum Selecti
 		}
 	} else {
 		const Poppler::TextBox *prev = next;
-		while (next != NULL) {
+		while (next != nullptr) {
 			if (click.x() < next->boundingBox().left()) {
 				if (word > 0) {
 					word--;
@@ -136,7 +127,7 @@ void Cursor::find_word(const Poppler::TextBox *text_box, bool from, enum Selecti
 				break;
 			}
 
-			if (next->nextWord() == NULL) {
+			if (next->nextWord() == nullptr) {
 				break;
 			}
 			prev = next;
@@ -201,7 +192,7 @@ void Cursor::set_end_of_line(const SelectionLine *line, bool from) {
 	part = line->get_parts().size() - 1;
 	Poppler::TextBox *text_box = line->get_parts().at(part)->get_text();
 	word = 0;
-	while (text_box->nextWord() != NULL) {
+	while (text_box->nextWord() != nullptr) {
 		text_box = text_box->nextWord();
 		word++;
 	}
@@ -224,7 +215,7 @@ void Cursor::increment() {
 
 	character++;
 	if (character >= text_box->text().size()) {
-		if (text_box->nextWord() == NULL) {
+		if (text_box->nextWord() == nullptr) {
 			part++;
 			if (part >= selectionline->get_parts().size()) {
 				part--;
@@ -275,7 +266,7 @@ void Cursor::decrement() {
 			part--;
 			text_box = selectionline->get_parts().at(part)->get_text();
 			word = 0;
-			while (text_box->nextWord() != NULL) {
+			while (text_box->nextWord() != nullptr) {
 				text_box = text_box->nextWord();
 				word++;
 			}
@@ -318,7 +309,7 @@ void MouseSelection::set_cursor(const QList<SelectionLine *> *lines,
 	c.page = pos.first;
 	c.click = pos.second;
 
-	if (lines == NULL || lines->empty()) {
+	if (lines == nullptr || lines->empty()) {
 		return;
 	}
 
@@ -394,7 +385,7 @@ Cursor MouseSelection::get_cursor(bool from) const {
 
 QString MouseSelection::get_selection_text(int page, const QList<SelectionLine *> *lines) const {
 	QString text;
-	if (lines != NULL && lines->size() != 0 && is_active()) {
+	if (lines != nullptr && lines->size() != 0 && is_active()) {
 		Cursor from = get_cursor(true);
 		Cursor to = get_cursor(false);
 		if (from.page <= page && to.page >= page) {
@@ -420,7 +411,7 @@ QString MouseSelection::get_selection_text(int page, const QList<SelectionLine *
 					}
 					int word = 0;
 					Poppler::TextBox *box = p.at(part)->get_text();
-					while (box != NULL) {
+					while (box != nullptr) {
 						if (to.line == line && to.part == part && to.word < word) {
 							break;
 						}

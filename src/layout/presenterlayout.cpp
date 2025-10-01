@@ -134,9 +134,9 @@ void PresenterLayout::render(QPainter *painter) {
 	for (int i = 0; i < 2; i++) {
 		int index = render_index + i;
 		const KPage *k_page = res->get_page(page + i, page_width[i], index);
-		if (k_page != NULL) {
+		if (k_page != nullptr) {
 			const QImage *img = k_page->get_image(index);
-			if (img != NULL) {
+			if (img != nullptr) {
 				int rot = (res->get_rotation() - k_page->get_rotation(index) + 4) % 4;
 				QRect rect;
 				painter->rotate(rot * 90);
@@ -182,11 +182,11 @@ void PresenterLayout::render(QPainter *painter) {
 	// prefetch
 	for (int count = 1; count <= prefetch_count; count++) {
 		// after current page
-		if (res->get_page(page + count, calculate_fit_width(page + count), render_index) != NULL) {
+		if (res->get_page(page + count, calculate_fit_width(page + count), render_index) != nullptr) {
 			res->unlock_page(page + count);
 		}
 		// before current page
-		if (res->get_page(page - count, calculate_fit_width(page - count), render_index) != NULL) {
+		if (res->get_page(page - count, calculate_fit_width(page - count), render_index) != nullptr) {
 			res->unlock_page(page - count);
 		}
 	}

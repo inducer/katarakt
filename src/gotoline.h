@@ -1,5 +1,4 @@
-#ifndef GOTOLINE_H
-#define GOTOLINE_H
+#pragma once
 
 #include <QLineEdit>
 #include <QIntValidator>
@@ -21,6 +20,3 @@ protected:
 private:
 	QIntValidator *v;
 };
-
-#endif
-

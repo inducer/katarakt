@@ -1,5 +1,4 @@
-#ifndef UTIL_H
-#define UTIL_H
+#pragma once
 
 #include <QRect>
 #include <QRectF>
@@ -27,6 +26,3 @@ QRect transform_rect_expand(const QRectF &rect, float scale, int off_x, int off_
 void add_action(QWidget *base, const char *action, const char *slot, QWidget *receiver);
 
 void invert_image(QImage *img);
-
-#endif
-

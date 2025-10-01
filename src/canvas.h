@@ -1,5 +1,4 @@
-#ifndef CANVAS_H
-#define CANVAS_H
+#pragma once
 
 #include <QWidget>
 #include <QPaintEvent>
@@ -43,7 +42,7 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void wheelEvent(QWheelEvent *event);
-	void mouseDoubleClickEvent(QMouseEvent * event);
+	void mouseDoubleClickEvent(QMouseEvent *event);
 	void resizeEvent(QResizeEvent *event);
 
 signals:
@@ -101,6 +100,3 @@ private:
 	Qt::MouseButton drag_view_button;
 	Qt::MouseButton select_text_button;
 };
-
-#endif
-

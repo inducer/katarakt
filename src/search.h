@@ -1,5 +1,4 @@
-#ifndef SEARCH_H
-#define SEARCH_H
+#pragma once
 
 #include <QString>
 #include <QThread>
@@ -12,11 +11,7 @@
 #include <QRect>
 #include <QEvent>
 #include <QList>
-#if QT_VERSION >= 0x050000
-#	include <poppler-qt5.h>
-#else
-#	include <poppler-qt4.h>
-#endif
+#include <poppler-qt6.h>
 
 
 class SearchBar;
@@ -82,7 +77,7 @@ private:
 	QLabel *progress;
 	QHBoxLayout *layout;
 
-	Poppler::Document *doc;
+	std::unique_ptr<Poppler::Document> doc;
 	Viewer *viewer;
 
 	std::map<int,QList<QRectF> *> hits;
@@ -99,6 +94,3 @@ private:
 
 	friend class SearchWorker;
 };
-
-#endif
-

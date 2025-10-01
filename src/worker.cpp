@@ -7,11 +7,7 @@
 #include "config.h"
 #include <list>
 #include <iostream>
-#if QT_VERSION >= 0x050000
-#	include <poppler-qt5.h>
-#else
-#	include <poppler-qt4.h>
-#endif
+#include <poppler-qt6.h>
 
 using namespace std;
 
@@ -84,10 +80,10 @@ void Worker::run() {
 #ifdef DEBUG
 		cerr << "    rendering page " << page << " for index " << index << ", center: " << res->center_page << endl;
 #endif
-		Poppler::Page *p = NULL;
+		std::unique_ptr<Poppler::Page> p;
 		if (render_new) {
 			p = res->doc->page(page);
-			if (p == NULL) {
+			if (p == nullptr) {
 				cerr << "failed to load page " << page << endl;
 				continue;
 			}
@@ -158,34 +154,28 @@ void Worker::run() {
 
 		// collect goto links
 		res->link_mutex.lock();
-		if (kp.links == NULL) {
-			res->link_mutex.unlock();
-
-			QList<Poppler::Link *> *links = new QList<Poppler::Link *>;
-			QList<Poppler::Link *> l = p->links();
-			links->swap(l);
-
-			res->link_mutex.lock();
-			kp.links = links;
+		if (!kp.links_initialized) {
+			kp.links_initialized = true;
+			kp.links = p->links();
 		}
-		if (kp.text == NULL) {
+		if (kp.text == nullptr) {
 			res->link_mutex.unlock();
 
-			QList<Poppler::TextBox *> text = p->textList();
+			auto text = p->textList();
 			// assign boxes to lines
 			// make single parts from chained boxes
 			set<Poppler::TextBox *> used;
 			QList<SelectionPart *> selection_parts;
-			Q_FOREACH(Poppler::TextBox *box, text) {
-				if (used.find(box) != used.end()) {
+			for (const auto &box : text) {
+				if (used.find(box.get()) != used.end()) {
 					continue;
 				}
-				used.insert(box);
+				used.insert(box.get());
 
-				SelectionPart *p = new SelectionPart(box);
+				SelectionPart *p = new SelectionPart(box.get());
 				selection_parts.push_back(p);
 				Poppler::TextBox *next = box->nextWord();
-				while (next != NULL) {
+				while (next != nullptr) {
 					used.insert(next);
 					p->add_word(next);
 					next = next->nextWord();
@@ -197,7 +187,7 @@ void Worker::run() {
 
 			QRectF line_box;
 			QList<SelectionLine *> *lines = new QList<SelectionLine *>();
-			Q_FOREACH(SelectionPart *part, selection_parts) {
+			for (SelectionPart *part : selection_parts) {
 				QRectF box = part->get_bbox();
 				// box fits into line_box's line
 				if (!lines->empty() && box.y() <= line_box.center().y() && box.bottom() > line_box.center().y()) {
@@ -230,11 +220,10 @@ void Worker::run() {
 			}
 
 			res->link_mutex.lock();
+			kp.text_boxes = std::move(text);
 			kp.text = lines;
 		}
 		res->link_mutex.unlock();
-
-		delete p;
 	}
 }
 

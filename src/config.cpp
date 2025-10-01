@@ -32,10 +32,10 @@ void CFG::default_setting(const char *name, const T value) {
 }
 
 // explicitly interpret all strings as utf8
-void CFG::default_key(const char *action, const char *key1, const char *key2 = NULL) {
+void CFG::default_key(const char *action, const char *key1, const char *key2 = nullptr) {
 	vk.push_back(QString::fromUtf8(action));
 	keys[vk.back()] = QStringList() << QString::fromUtf8(key1);
-	if (key2 != NULL) {
+	if (key2) {
 		keys[vk.back()] << QString::fromUtf8(key2);
 	}
 }

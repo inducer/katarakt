@@ -1,12 +1,7 @@
-#ifndef SELECTIONPART_H
-#define SELECTIONPART_H
+#pragma once
 
 #include <QRectF>
-#if QT_VERSION >= 0x050000
-#	include <poppler-qt5.h>
-#else
-#	include <poppler-qt4.h>
-#endif
+#include <poppler-qt6.h>
 
 
 namespace Selection {
@@ -22,7 +17,6 @@ namespace Selection {
 class SelectionPart {
 public:
 	SelectionPart(Poppler::TextBox *box);
-	~SelectionPart();
 
 	void add_word(Poppler::TextBox *box);
 	Poppler::TextBox *get_text() const;
@@ -104,7 +98,3 @@ private:
 	bool reversed;
 	enum Selection::Mode mode;
 };
-
-
-#endif
-

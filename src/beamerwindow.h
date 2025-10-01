@@ -1,5 +1,4 @@
-#ifndef BEAMERWINDOW_H
-#define BEAMERWINDOW_H
+#pragma once
 
 #include <QWidget>
 
@@ -49,6 +48,3 @@ private:
 	bool frozen;
 	bool valid;
 };
-
-#endif
-

@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 #include <QFileInfo>
@@ -49,7 +49,7 @@ bool activate_katarakt_with_file(QString file) {
 	QString filepath = QFileInfo(file).absoluteFilePath();
 	QDBusConnection bus = QDBusConnection::sessionBus();
 	QStringList services = bus.interface()->registeredServiceNames().value();
-	QStringList katarakts = services.filter(QRegExp(QString::fromUtf8("^katarakt\\.pid")));
+	QStringList katarakts = services.filter(QRegularExpression(QString::fromUtf8("^katarakt\\.pid")));
 	foreach (const QString& katarakt_service, katarakts) {
 		QDBusInterface dbus_iface(katarakt_service, QString::fromUtf8("/"), QString::fromUtf8("katarakt.SourceCorrelate"), bus);
 		QDBusReply<QString> reply = dbus_iface.call(QString::fromUtf8("filepath"));

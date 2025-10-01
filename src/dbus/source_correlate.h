@@ -1,5 +1,4 @@
-#ifndef SOURCE_CORRELATE_H
-#define SOURCE_CORRELATE_H
+#pragma once
 
 #include <QDBusAbstractAdaptor>
 
@@ -43,5 +42,3 @@ private slots:
 private:
 	Viewer *viewer;
 };
-
-#endif /* SOURCE_CORRELATE_H */

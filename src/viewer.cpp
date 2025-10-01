@@ -24,14 +24,14 @@ int Viewer::sig_fd[2];
 
 Viewer::Viewer(const QString &file, QWidget *parent) :
 		QWidget(parent),
-		res(NULL),
-		splitter(NULL),
-		toc(NULL),
-		canvas(NULL),
-		search_bar(NULL),
-		layout(NULL),
-		sig_notifier(NULL),
-		beamer(NULL),
+		res(nullptr),
+		splitter(nullptr),
+		toc(nullptr),
+		canvas(nullptr),
+		search_bar(nullptr),
+		layout(nullptr),
+		sig_notifier(nullptr),
+		beamer(nullptr),
 		valid(true) {
 	res = new ResourceManager(file, this);
 	if (!res->is_valid()) {

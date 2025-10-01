@@ -4,10 +4,7 @@
 
 using namespace std;
 
-KPage::KPage() :
-		links(NULL),
-		inverted_colors(false),
-		text(NULL) {
+KPage::KPage() {
 	for (int i = 0; i < 3; i++) {
 		status[i] = 0;
 		rotation[i] = 0;
@@ -15,13 +12,7 @@ KPage::KPage() :
 }
 
 KPage::~KPage() {
-	if (links != NULL) {
-		Q_FOREACH(Poppler::Link *l, *links) {
-			delete l;
-		}
-	}
-	delete links;
-	if (text != NULL) {
+	if (text != nullptr) {
 		Q_FOREACH(SelectionLine *line, *text) {
 			delete line;
 		}
@@ -37,7 +28,7 @@ const QImage *KPage::get_image(int index) const {
 		}
 	}
 	if (thumbnail.isNull()) {
-		return NULL;
+		return nullptr;
 	} else {
 		return &thumbnail;
 	}

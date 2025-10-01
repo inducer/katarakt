@@ -105,31 +105,17 @@ void SearchWorker::run() {
 		int hit_count = 0;
 		int page = start;
 		do {
-			Poppler::Page *p = bar->doc->page(page);
-			if (p == NULL) {
+			auto p = bar->doc->page(page);
+			if (!p) {
 				cerr << "failed to load page " << page << endl;
 				continue;
 			}
 
 			// collect all occurrences
 			QList<QRectF> *hits = new QList<QRectF>;
-#if POPPLER_VERSION < POPPLER_VERSION_CHECK(0, 22, 0)
-			// old search interface, slow for many hits per page
-			double x = 0, y = 0, x2 = 0, y2 = 0;
-			while (!stop && !die &&
-					p->search(search_term, x, y, x2, y2, Poppler::Page::NextResult,
-						has_upper_case ? Poppler::Page::CaseSensitive : Poppler::Page::CaseInsensitive)) {
-				hits->push_back(QRectF(x, y, x2 - x, y2 - y));
-			}
-#elif POPPLER_VERSION < POPPLER_VERSION_CHECK(0, 31, 0)
-			// new search interface
-			QList<QRectF> tmp = p->search(search_term,
-					has_upper_case ? Poppler::Page::CaseSensitive : Poppler::Page::CaseInsensitive);
-			hits->swap(tmp);
-#else
 			if (use_regex) {
 				// regex is valid -> perform regex matching
-				QList<Poppler::TextBox *> text_list = p->textList();
+				auto text_list = p->textList();
 
 				// precompute text length
 				size_t text_length = 0u;
@@ -168,7 +154,7 @@ void SearchWorker::run() {
 						if (offset < box->text().size()) {
 							// the match starts in the current box -> gather bounding boxes
 							int end_offset = offset + match.capturedLength();
-							for (int i = std::max(offset, 0); i < std::min(end_offset, box->text().size()); ++i)
+							for (int i = std::max(offset, 0); i < std::min(end_offset, static_cast<int>(box->text().size())); ++i)
 								hit_rect |= box->charBoundingBox(i);
 
 							if (end_offset < box->text().size())
@@ -196,10 +182,6 @@ void SearchWorker::run() {
 						hits->push_back(hit_rect);
 				}
 
-				// clean up
-				for (auto box : text_list)
-					delete box;
-
 			} else {
 				// use traditional search
 				QList<QRectF> tmp = p->search(search_term, has_upper_case ? (Poppler::Page::SearchFlags) 0 : Poppler::Page::IgnoreCase);
@@ -207,13 +189,11 @@ void SearchWorker::run() {
 				hits->swap(tmp);
 			}
 
-#endif
 #ifdef DEBUG
 			if (hits->size() > 0) {
 				cerr << hits->size() << " hits on page " << page << endl;
 			}
 #endif
-			delete p;
 
 			// clean up when interrupted
 			if (stop || die) {
@@ -286,23 +266,22 @@ SearchBar::SearchBar(const QString &file, Viewer *v, QWidget *parent) :
 }
 
 void SearchBar::initialize(const QString &file, const QByteArray &password) {
-	worker = NULL;
+	worker = nullptr;
 
-	doc = NULL;
+	doc = nullptr;
 //	if (!file.isNull()) { // don't print the poppler error message for the second time
 	if (!file.isEmpty()) {
 		doc = Poppler::Document::load(file, QByteArray(), password);
 	}
 
-	if (doc == NULL) {
+	if (!doc) {
 		// poppler already prints a debug message
 		return;
 	}
 	if (doc->isLocked()) {
 		// poppler already prints a debug message
 //		cerr << "missing password" << endl;
-		delete doc;
-		doc = NULL;
+		doc = nullptr;
 		return;
 	}
 	worker = new SearchWorker(this);
@@ -326,13 +305,12 @@ SearchBar::~SearchBar() {
 }
 
 void SearchBar::shutdown() {
-	if (worker != NULL) {
+	if (worker != nullptr) {
 		join_threads();
 	}
-	if (doc == NULL) {
-		return;
-	}
-	delete doc;
+
+	if (!doc) return;
+
 	delete worker;
 }
 
@@ -342,7 +320,7 @@ void SearchBar::load(const QString &file, const QByteArray &password) {
 }
 
 bool SearchBar::is_valid() const {
-	return doc != NULL;
+	return doc != nullptr;
 }
 
 void SearchBar::focus(bool forward, bool use_regex) {

@@ -1,5 +1,4 @@
-#ifndef SPLITTER_H
-#define SPLITTER_H
+#pragma once
 
 #include <QSplitter>
 #include <QSplitterHandle>
@@ -29,6 +28,3 @@ public:
 protected:
 	QSplitterHandle *createHandle();
 };
-
-#endif
-

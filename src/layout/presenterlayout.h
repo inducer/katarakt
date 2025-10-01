@@ -1,5 +1,4 @@
-#ifndef PRESENTERLAYOUT_H
-#define PRESENTERLAYOUT_H
+#pragma once
 
 #include "layout.h"
 
@@ -25,6 +24,3 @@ protected:
 	float optimized_ratio;
 	bool horizontal_split; // true if main slide is on the left
 };
-
-#endif
-

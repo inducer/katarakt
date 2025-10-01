@@ -3,23 +3,25 @@ TARGET = katarakt
 DEPENDPATH += .
 INCLUDEPATH += .
 CONFIG += qt
-QT += network xml dbus
+QT += widgets network xml dbus
+DEFINES += QT_DEPRECATED_WARNINGS
 
-greaterThan(QT_MAJOR_VERSION, 4) {
-    QT += widgets
-    DEFINES += QT_DEPRECATED_WARNINGS
-}
 POPPLER = poppler-qt$$QT_MAJOR_VERSION
 
 unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += $$POPPLER
 
-    isEmpty(PKG_CONFIG):PKG_CONFIG = pkg-config    # same as in link_pkgconfig.prf
+    isEmpty(PKG_CONFIG):PKG_CONFIG = pkg-config	# same as in link_pkgconfig.prf
     POPPLER_VERSION = $$system($$PKG_CONFIG --modversion $$POPPLER)
+
     POPPLER_VERSION_MAJOR = $$system(echo "$$POPPLER_VERSION" | cut -d . -f 1 | sed "\'s,^0*\\(.\\),\1,\'")
     POPPLER_VERSION_MINOR = $$system(echo "$$POPPLER_VERSION" | cut -d . -f 2 | sed "\'s,^0*\\(.\\),\1,\'")
     POPPLER_VERSION_MICRO = $$system(echo "$$POPPLER_VERSION" | cut -d . -f 3 | sed "\'s,^0*\\(.\\),\1,\'")
+
+    POPPLER_VERSION_MAJOR = $$system(expr "$$POPPLER_VERSION_MAJOR" + 0)
+    POPPLER_VERSION_MINOR = $$system(expr "$$POPPLER_VERSION_MINOR" + 0)
+    POPPLER_VERSION_MICRO = $$system(expr "$$POPPLER_VERSION_MICRO" + 0)
 
     DEFINES += POPPLER_VERSION_MAJOR=$$POPPLER_VERSION_MAJOR
     DEFINES += POPPLER_VERSION_MINOR=$$POPPLER_VERSION_MINOR
@@ -31,16 +33,16 @@ DEFINES += QT_NO_CAST_FROM_ASCII QT_NO_CAST_TO_ASCII
 QMAKE_CXXFLAGS_DEBUG += -DDEBUG
 
 # Input
-HEADERS +=  src/layout/layout.h src/layout/singlelayout.h src/layout/gridlayout.h src/layout/presenterlayout.h \
-            src/viewer.h src/canvas.h src/resourcemanager.h src/grid.h src/search.h src/gotoline.h src/config.h \
-            src/download.h src/util.h src/kpage.h src/worker.h src/beamerwindow.h src/toc.h src/splitter.h src/selection.h \
-            src/dbus/source_correlate.h src/dbus/dbus.h
+HEADERS += src/layout/layout.h src/layout/singlelayout.h src/layout/gridlayout.h src/layout/presenterlayout.h \
+           src/viewer.h src/canvas.h src/resourcemanager.h src/grid.h src/search.h src/gotoline.h src/config.h \
+           src/download.h src/util.h src/kpage.h src/worker.h src/beamerwindow.h src/toc.h src/splitter.h src/selection.h \
+           src/dbus/source_correlate.h src/dbus/dbus.h
 
-SOURCES +=  src/main.cpp \
-            src/layout/layout.cpp src/layout/singlelayout.cpp src/layout/gridlayout.cpp src/layout/presenterlayout.cpp \
-            src/viewer.cpp src/canvas.cpp src/resourcemanager.cpp src/grid.cpp src/search.cpp src/gotoline.cpp src/config.cpp \
-            src/download.cpp src/util.cpp src/kpage.cpp src/worker.cpp src/beamerwindow.cpp src/toc.cpp src/splitter.cpp \
-            src/selection.cpp src/dbus/source_correlate.cpp src/dbus/dbus.cpp
+SOURCES += src/main.cpp \
+           src/layout/layout.cpp src/layout/singlelayout.cpp src/layout/gridlayout.cpp src/layout/presenterlayout.cpp \
+           src/viewer.cpp src/canvas.cpp src/resourcemanager.cpp src/grid.cpp src/search.cpp src/gotoline.cpp src/config.cpp \
+           src/download.cpp src/util.cpp src/kpage.cpp src/worker.cpp src/beamerwindow.cpp src/toc.cpp src/splitter.cpp \
+           src/selection.cpp src/dbus/source_correlate.cpp src/dbus/dbus.cpp
 
 documentation.target = doc/katarakt.1
 documentation.depends = doc/katarakt.txt
