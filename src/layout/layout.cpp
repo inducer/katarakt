@@ -96,7 +96,7 @@ bool Layout::supports_smooth_scrolling() const {
 	return false;
 }
 
-void Layout::scroll_smooth(int /*dx*/, int /*dy*/) {
+void Layout::scroll_smooth(qreal /*dx*/, qreal /*dy*/) {
 	// implement in child classes where necessary
 }
 

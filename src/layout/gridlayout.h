@@ -20,7 +20,7 @@ public:
 	void set_columns(int new_columns, bool relative = true) override;
 	void set_offset(int new_offset, bool relative = true) override;
 
-	void scroll_smooth(int dx, int dy) override;
+	void scroll_smooth(qreal dx, qreal dy) override;
 	void scroll_page(int new_page, bool relative = true) override;
 	void scroll_page_top_jump(int new_page, bool relative = true) override;
 	void render(QPainter *painter, double device_pixel_ratio) override;
@@ -40,7 +40,7 @@ protected:
 	// internal functions for nested use
 	// they don't call the viewer that stuff needs updating
 	bool set_columns_noupdate(int new_columns, bool relative = true);
-	bool scroll_smooth_noupdate(int dx, int dy);
+	bool scroll_smooth_noupdate(qreal dx, qreal dy);
 	bool scroll_page_noupdate(int new_page, bool relative = true);
 
 private:
@@ -54,7 +54,7 @@ private:
 
 	Grid *grid;
 
-	int off_x, off_y;
+	qreal off_x, off_y;
 	int horizontal_page;
 	int last_visible_page;
 	float size;

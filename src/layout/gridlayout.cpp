@@ -197,9 +197,10 @@ void GridLayout::set_offset(int new_offset, bool relative) {
 	}
 }
 
-bool GridLayout::scroll_smooth_noupdate(int dx, int dy) {
-	int old_off_x = off_x;
-	int old_off_y = off_y;
+bool GridLayout::scroll_smooth_noupdate(qreal dx, qreal dy) {
+	// TODO round to 1/device_pixel_ratio steps instead of int for dpi independent smooth scrolling
+	int old_off_x = static_cast<int>(off_x);
+	int old_off_y = static_cast<int>(off_y);
 	int old_page = get_page();
 	off_x += dx;
 	off_y += dy;
@@ -262,10 +263,13 @@ bool GridLayout::scroll_smooth_noupdate(int dx, int dy) {
 			off_x = border_off_w;
 		}
 	}
-	return off_x != old_off_x || off_y != old_off_y || get_page() != old_page;
+
+	bool off_x_changed = static_cast<int>(off_x) != old_off_x;
+	bool off_y_changed = static_cast<int>(off_y) != old_off_y;
+	return off_x_changed || off_y_changed || get_page() != old_page;
 }
 
-void GridLayout::scroll_smooth(int dx, int dy) {
+void GridLayout::scroll_smooth(qreal dx, qreal dy) {
 	int old_page = get_page();
 	if (scroll_smooth_noupdate(dx, dy)) {
 		viewer->layout_updated(get_page(), get_page() != old_page);

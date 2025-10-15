@@ -26,7 +26,7 @@ public:
 	virtual void resize(int w, int h);
 
 	// normal movement
-	virtual void scroll_smooth(int dx, int dy);
+	virtual void scroll_smooth(qreal dx, qreal dy);
 	virtual void scroll_page(int new_page, bool relative = true);
 
 	virtual void goto_page_at(int mx, int my);

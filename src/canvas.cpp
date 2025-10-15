@@ -266,28 +266,20 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
 		// wrap mouse around when dragging at the border
 		if (mx <= 0) {
 			mx = width() - 2;
-			QCursor c = cursor();
-			c.setPos(mapToGlobal(QPoint(mx, my)));
-			setCursor(c);
+			QCursor::setPos(mapToGlobal(QPoint(mx, my)));
 		}
 		if (mx >= width() - 1) {
 			mx = 1;
-			QCursor c = cursor();
-			c.setPos(mapToGlobal(QPoint(mx, my)));
-			setCursor(c);
+			QCursor::setPos(mapToGlobal(QPoint(mx, my)));
 		}
 
 		if (my <= 0) {
 			my = height() - 2;
-			QCursor c = cursor();
-			c.setPos(mapToGlobal(QPoint(mx, my)));
-			setCursor(c);
+			QCursor::setPos(mapToGlobal(QPoint(mx, my)));
 		}
 		if (my >= height() - 1) {
 			my = 1;
-			QCursor c = cursor();
-			c.setPos(mapToGlobal(QPoint(mx, my)));
-			setCursor(c);
+			QCursor::setPos(mapToGlobal(QPoint(mx, my)));
 		}
 	}
 	if (select_text_button != Qt::NoButton && event->buttons() & select_text_button) {

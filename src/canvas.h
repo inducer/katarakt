@@ -81,8 +81,8 @@ private:
 	GotoLine *goto_line;
 	QLabel *page_overlay;
 
-	int mx, my;
-	int mx_down, my_down;
+	qreal mx, my;
+	qreal mx_down, my_down;
 	bool triple_click_possible;
 
 	int hide_mouse_timeout;
