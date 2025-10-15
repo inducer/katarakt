@@ -23,8 +23,8 @@ Input is always responsive, because CPU-intensive operations like rendering and 
 
 ### Dependencies
 
-* `qt` version 4 or 5
-* `poppler-qt` 4 or 5 ≥  0.18
+* `qt6`
+* `poppler-qt6`
 
 ### Source code
 
@@ -35,14 +35,12 @@ You can browse the [git repo](https://gitlab.cs.fau.de/Qui_Sum/katarakt) online 
 git clone https://gitlab.cs.fau.de/Qui_Sum/katarakt.git
 ```
 
-Tarballs are available [here](https://wwwcip.cs.fau.de/~go18gomu/katarakt/tarballs/).
-
 ### Community
 
 Feel free to join `#katarakt` on `freenode`.
 
 ### License
 
-Copyright © 2011-2018, Philipp Erhardt. All rights reserved.
+Copyright © 2011-2025, Philipp Erhardt. All rights reserved.
 
 katarakt is free software. You can redistribute it and/or modify it under the terms of the simplified BSD license.
