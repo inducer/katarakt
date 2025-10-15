@@ -22,14 +22,15 @@ class SelectionLine;
 
 class Request {
 public:
-	Request(int width, int index);
+	Request(int width, double device_pixel_ratio, int index);
 
 	int get_lowest_index();
 	bool has_index(int index);
 	bool remove_index_ok(int index);
-	void update(int width, int index);
+	void update(int width, double device_pixel_ratio, int index);
 
 	int width[3];
+	double device_pixel_ratio[3];
 };
 
 
@@ -49,7 +50,7 @@ public:
 	const QString &get_file() const;
 	void set_file(const QString &new_file);
 	// page (meta)data
-	const KPage *get_page(int page, int newWidth, int index);
+	const KPage *get_page(int page, int newWidth, double device_pixel_ratio, int index);
 //	QString get_page_label(int page) const;
 	float get_page_width(int page, bool rotated = true) const;
 	float get_page_height(int page, bool rotated = true) const;
@@ -82,7 +83,7 @@ public slots:
 	void inotify_slot();
 
 private:
-	void enqueue(int page, int width, int index = 0);
+	void enqueue(int page, int width, double device_pixel_ratio, int index = 0);
 
 	void initialize(const QString &file, const QByteArray &password);
 	void join_threads();

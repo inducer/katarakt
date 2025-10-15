@@ -346,7 +346,7 @@ void GridLayout::scroll_page_top_jump(int new_page, bool relative) {
 	}
 }
 
-void GridLayout::render(QPainter *painter) {
+void GridLayout::render(QPainter *painter, double device_pixel_ratio) {
 	// vertical
 	int cur_page = page;
 	int last_page = page + horizontal_page;
@@ -368,7 +368,7 @@ void GridLayout::render(QPainter *painter) {
 			int center_x = (grid_width - page_width) / 2;
 			int center_y = (grid_height - page_height) / 2;
 
-			const KPage *k_page = res->get_page(last_page, page_width, render_index);
+			const KPage *k_page = res->get_page(last_page, page_width, device_pixel_ratio, render_index);
 			if (k_page != nullptr) {
 				const QImage *img = k_page->get_image();
 				if (img != nullptr) {
@@ -428,12 +428,12 @@ void GridLayout::render(QPainter *painter) {
 	for (int count = 0; count < prefetch_count; count++) {
 		// after last visible page
 		int page_width = res->get_page_width(prefetch_last + count) * size;
-		if (res->get_page(prefetch_last + count, page_width, render_index) != nullptr) {
+		if (res->get_page(prefetch_last + count, page_width, device_pixel_ratio, render_index) != nullptr) {
 			res->unlock_page(prefetch_last + count);
 		}
 		// before first visible page
 		page_width = res->get_page_width(prefetch_first + count) * size;
-		if (res->get_page(prefetch_first + count, page_width, render_index) != nullptr) {
+		if (res->get_page(prefetch_first + count, page_width, device_pixel_ratio, render_index) != nullptr) {
 			res->unlock_page(prefetch_first + count);
 		}
 	}

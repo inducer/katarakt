@@ -44,7 +44,7 @@ public:
 	virtual void goto_position(int page, QPointF pos);
 
 	// misc actions
-	virtual void render(QPainter *painter) = 0;
+	virtual void render(QPainter *painter, double device_pixel_ratio) = 0;
 
 	virtual void set_zoom(int new_zoom, bool relative = true);
 	virtual void set_columns(int new_columns, bool relative = true);

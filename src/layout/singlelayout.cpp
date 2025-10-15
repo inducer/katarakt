@@ -40,9 +40,9 @@ const QRect SingleLayout::calculate_placement(int page) const {
 	return QRect(center_x, center_y, page_width, page_height);
 }
 
-void SingleLayout::render(QPainter *painter) {
+void SingleLayout::render(QPainter *painter, double device_pixel_ratio) {
 	const QRect p = calculate_placement(page);
-	const KPage *k_page = res->get_page(page, p.width(), render_index);
+	const KPage *k_page = res->get_page(page, p.width(), device_pixel_ratio, render_index);
 	if (k_page != nullptr) {
 		const QImage *img = k_page->get_image();
 		if (img != nullptr) {
@@ -104,11 +104,11 @@ void SingleLayout::render(QPainter *painter) {
 	// prefetch
 	for (int count = 1; count <= prefetch_count; count++) {
 		// after current page
-		if (res->get_page(page + count, calculate_fit_width(page + count), render_index) != nullptr) {
+		if (res->get_page(page + count, calculate_fit_width(page + count), device_pixel_ratio, render_index) != nullptr) {
 			res->unlock_page(page + count);
 		}
 		// before current page
-		if (res->get_page(page - count, calculate_fit_width(page - count), render_index) != nullptr) {
+		if (res->get_page(page - count, calculate_fit_width(page - count), device_pixel_ratio, render_index) != nullptr) {
 			res->unlock_page(page - count);
 		}
 	}

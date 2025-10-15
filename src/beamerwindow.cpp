@@ -66,7 +66,7 @@ void BeamerWindow::paintEvent(QPaintEvent * /*event*/) {
 #endif
 	QPainter painter(this);
 	painter.fillRect(rect(), QColor(0, 0, 0));
-	layout->render(&painter);
+	layout->render(&painter, devicePixelRatio());
 }
 
 void BeamerWindow::mousePressEvent(QMouseEvent *event) {

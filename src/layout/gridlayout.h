@@ -11,30 +11,30 @@ public:
 	GridLayout(Viewer *v, int render_index, int page = 0, int columns = 1);
 	~GridLayout();
 
-	int get_page() const;
+	int get_page() const override;
 
-	void activate(const Layout *old_layout);
-	void rebuild(bool clamp = true);
-	void resize(int w, int h);
-	void set_zoom(int new_zoom, bool relative = true);
-	void set_columns(int new_columns, bool relative = true);
-	void set_offset(int new_offset, bool relative = true);
+	void activate(const Layout *old_layout) override;
+	void rebuild(bool clamp = true) override;
+	void resize(int w, int h) override;
+	void set_zoom(int new_zoom, bool relative = true) override;
+	void set_columns(int new_columns, bool relative = true) override;
+	void set_offset(int new_offset, bool relative = true) override;
 
-	void scroll_smooth(int dx, int dy);
-	void scroll_page(int new_page, bool relative = true);
-	void scroll_page_top_jump(int new_page, bool relative = true);
-	void render(QPainter *painter);
+	void scroll_smooth(int dx, int dy) override;
+	void scroll_page(int new_page, bool relative = true) override;
+	void scroll_page_top_jump(int new_page, bool relative = true) override;
+	void render(QPainter *painter, double device_pixel_ratio) override;
 
-	void advance_invisible_hit(bool forward = true);
+	void advance_invisible_hit(bool forward = true) override;
 
-	std::pair<int, QPointF> get_location_at(int pixel_x, int pixel_y) const;
-	void goto_link_destination(const Poppler::LinkDestination &link);
-	void goto_position(int page, QPointF pos);
-	void goto_page_at(int mx, int my);
+	std::pair<int, QPointF> get_location_at(int pixel_x, int pixel_y) const override;
+	void goto_link_destination(const Poppler::LinkDestination &link) override;
+	void goto_position(int page, QPointF pos) override;
+	void goto_page_at(int mx, int my) override;
 
-	bool page_visible(int p) const;
+	bool page_visible(int p) const override;
 
-	bool supports_smooth_scrolling() const;
+	bool supports_smooth_scrolling() const override;
 
 protected:
 	// internal functions for nested use
@@ -46,7 +46,7 @@ protected:
 private:
 	void initialize(int columns, int offset, bool clamp = true);
 	void set_constants(bool clamp = true);
-	void view_hit();
+	void view_hit() override;
 	void view_rect(const QRect &r);
 	void view_point(const QPoint &p);
 	QRect get_target_rect(int target_page, QRectF target_rect) const;

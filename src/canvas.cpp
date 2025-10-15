@@ -188,7 +188,7 @@ void Canvas::paintEvent(QPaintEvent * /*event*/) {
 	} else {
 		painter.fillRect(rect(), background);
 	}
-	cur_layout->render(&painter);
+	cur_layout->render(&painter, devicePixelRatio());
 }
 
 void Canvas::mousePressEvent(QMouseEvent *event) {

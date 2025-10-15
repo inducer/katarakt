@@ -31,6 +31,7 @@ void Worker::run() {
 		// get next page to render
 		res->requestMutex.lock();
 		int page, width, index;
+		double device_pixel_ratio;
 		map<int,Request>::iterator less = res->requests.lower_bound(res->center_page);
 		map<int,Request>::iterator greater = less--;
 		map<int,Request>::iterator closest;
@@ -53,6 +54,7 @@ void Worker::run() {
 		page = closest->first;
 		index = closest->second.get_lowest_index();
 		width = closest->second.width[index];
+		device_pixel_ratio = closest->second.device_pixel_ratio[index];
 		if (closest->second.remove_index_ok(index)) {
 			res->requestSemaphore.release(1);
 		} else {
@@ -68,7 +70,7 @@ void Worker::run() {
 		if (kp.status[index] == width && kp.rotation[index] == res->rotation) {
 			if (kp.img[index].isNull()) { // only invert colors
 				render_new = false;
-			} else { // nothing to do
+			} else if (kp.img[index].devicePixelRatio() == device_pixel_ratio) { // nothing to do
 				kp.mutex.unlock();
 				continue;
 			}
@@ -78,7 +80,7 @@ void Worker::run() {
 
 		// open page
 #ifdef DEBUG
-		cerr << "    rendering page " << page << " for index " << index << ", center: " << res->center_page << endl;
+		cerr << "    rendering page " << page << " for index " << index << " with ratio " << device_pixel_ratio << ", center: " << res->center_page << endl;
 #endif
 		std::unique_ptr<Poppler::Page> p;
 		if (render_new) {
@@ -89,9 +91,11 @@ void Worker::run() {
 			}
 
 			// render page
-			float dpi = 72.0 * width / res->get_page_width(page);
+			float dpi = 72.0 * width / res->get_page_width(page) * device_pixel_ratio;
 			QImage img = p->renderToImage(dpi, dpi, -1, -1, -1, -1,
 					static_cast<Poppler::Page::Rotation>(rotation));
+
+			img.setDevicePixelRatio(device_pixel_ratio);
 
 			if (img.isNull()) {
 				cerr << "failed to render page " << page << endl;

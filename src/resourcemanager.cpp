@@ -20,11 +20,13 @@
 using namespace std;
 
 
-Request::Request(int width, int index) {
+Request::Request(int width, double device_pixel_ratio, int index) {
 	for (int i = 0; i < 3; i++) {
 		this->width[i] = -1;
+		this->device_pixel_ratio[i] = 1.0;
 	}
 	this->width[index] = width;
+	this->device_pixel_ratio[index] = device_pixel_ratio;
 }
 
 int Request::get_lowest_index() {
@@ -51,8 +53,9 @@ bool Request::remove_index_ok(int index) {
 	return false;
 }
 
-void Request::update(int width, int index) {
+void Request::update(int width, double device_pixel_ratio, int index) {
 	this->width[index] = width;
+	this->device_pixel_ratio[index] = device_pixel_ratio;
 }
 
 
@@ -205,12 +208,12 @@ void ResourceManager::set_file(const QString &new_file) {
 	file = new_file;
 }
 
-const KPage *ResourceManager::get_page(int page, int width, int index) {
+const KPage *ResourceManager::get_page(int page, int width, double device_pixel_ratio, int index) {
 	if (page < 0 || page >= get_page_count()) {
 		return nullptr;
 	}
 
-	// page not available or wrong size/rotation/color
+	// page not available or wrong size/rotation/device_pixel_ratio/color
 	k_page[page].mutex.lock();
 	bool must_invert_colors = k_page[page].inverted_colors != inverted_colors;
 	if (must_invert_colors) {
@@ -220,8 +223,9 @@ const KPage *ResourceManager::get_page(int page, int width, int index) {
 	if (k_page[page].img[index].isNull() ||
 			k_page[page].status[index] != width ||
 			k_page[page].rotation[index] != rotation ||
+			k_page[page].img[index].devicePixelRatio() != device_pixel_ratio ||
 			must_invert_colors) {
-		enqueue(page, width, index);
+		enqueue(page, width, device_pixel_ratio, index);
 	}
 
 	return &k_page[page];
@@ -383,14 +387,14 @@ void ResourceManager::inotify_slot() {
 #endif
 }
 
-void ResourceManager::enqueue(int page, int width, int index) {
+void ResourceManager::enqueue(int page, int width, double device_pixel_ratio, int index) {
 	requestMutex.lock();
 	map<int,Request>::iterator it = requests.find(page);
 	if (it == requests.end()) {
-		requests.insert(make_pair(page, Request(width, index)));
+		requests.insert(make_pair(page, Request(width, device_pixel_ratio, index)));
 		requestSemaphore.release(1);
 	} else {
-		it->second.update(width, index);
+		it->second.update(width, device_pixel_ratio, index);
 	}
 	requestMutex.unlock();
 }

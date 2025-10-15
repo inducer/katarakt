@@ -7,15 +7,15 @@ public:
 	PresenterLayout(Viewer *v, int render_index, int page = 0);
 	virtual ~PresenterLayout();
 
-	void rebuild(bool clamp = true);
-	void resize(int w, int h);
+	void rebuild(bool clamp = true) override;
+	void resize(int w, int h) override;
 
-	void render(QPainter *painter);
+	void render(QPainter *painter, double device_pixel_ratio) override;
 
-	void advance_invisible_hit(bool forward = true);
+	void advance_invisible_hit(bool forward = true) override;
 
-	std::pair<int, QPointF> get_location_at(int pixel_x, int pixel_y) const;
-	bool page_visible(int p) const;
+	std::pair<int, QPointF> get_location_at(int pixel_x, int pixel_y) const override;
+	bool page_visible(int p) const override;
 
 protected:
 	int calculate_fit_width(int page) const;
