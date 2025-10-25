@@ -4,15 +4,13 @@ katarakt is a simple PDF viewer with two layouts.
 
 Dependencies
 ------------
-qt-core, qt-gui version 4
-poppler-qt >= 0.18
-
-For a faster search implementation you need poppler-qt >= 0.22
+qt6
+poppler-qt6
 
 Building
 --------
 To build katarakt type:
-qmake-qt4
+qmake6
 make
 
 To build the manpage/homepage type:
