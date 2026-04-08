@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
 			case 'p':
 				// currently no warning message on wrong input
 				CFG::get_instance()->set_tmp_value("start_page", atoi(optarg) - 1);
+				CFG::get_instance()->set_tmp_value("start_page_set", true);
 				break;
 			case 'f':
 				CFG::get_instance()->set_tmp_value("fullscreen", true);

@@ -56,6 +56,7 @@ public:
 
 	// misc getters
 	virtual int get_page() const;
+	virtual int get_zoom() const;
 	virtual bool supports_smooth_scrolling() const;
 	virtual bool get_search_visible() const;
 	virtual bool page_visible(int p) const = 0;

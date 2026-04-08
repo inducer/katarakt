@@ -39,6 +39,10 @@ int GridLayout::get_page() const {
 	return tmp;
 }
 
+int GridLayout::get_zoom() const {
+	return zoom;
+}
+
 void GridLayout::initialize(int columns, int offset, bool clamp) {
 	grid = new Grid(res, columns, offset);
 

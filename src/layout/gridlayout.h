@@ -12,6 +12,7 @@ public:
 	~GridLayout();
 
 	int get_page() const override;
+	int get_zoom() const override;
 
 	void activate(const Layout *old_layout) override;
 	void rebuild(bool clamp = true) override;

@@ -351,6 +351,17 @@ int ResourceManager::jump_forward() {
 	return *cur_jump_pos;
 }
 
+std::list<int> ResourceManager::get_jumplist() const {
+	return jumplist;
+}
+
+void ResourceManager::set_jumplist(const std::list<int> &list) {
+	clear_jumps();
+	for (int page : list) {
+		store_jump(page);
+	}
+}
+
 std::unique_ptr<Poppler::LinkDestination> ResourceManager::resolve_link_destination(const QString &name) const {
 	return doc->linkDestination(name);
 }

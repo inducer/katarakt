@@ -32,6 +32,8 @@ public:
 	void set_search_visible(bool visible);
 
 	Layout *get_layout() const;
+	QString get_layout_name() const;
+	void set_layout_by_name(const QString &name);
 
 	void update_page_overlay();
 
