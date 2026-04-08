@@ -1,6 +1,8 @@
 #include <iostream>
 #include <QCoreApplication>
 #include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QAction>
 #include <QFileDialog>
 #include <csignal>
@@ -15,6 +17,7 @@
 #include "beamerwindow.h"
 #include "toc.h"
 #include "splitter.h"
+#include "statefile.h"
 #include "util.h"
 
 using namespace std;
@@ -143,6 +146,7 @@ Viewer::Viewer(const QString &file, QWidget *parent) :
 
 	// apply start options
 	if (res->is_valid()) {
+		load_state();
 		canvas->get_layout()->scroll_page(config->get_tmp_value("start_page").toInt(), false);
 	}
 	if (CFG::get_instance()->get_tmp_value("fullscreen").toBool()) {
@@ -164,6 +168,7 @@ Viewer::Viewer(const QString &file, QWidget *parent) :
 }
 
 Viewer::~Viewer() {
+	save_state();
 	::close(sig_fd[0]);
 	::close(sig_fd[1]);
 	delete beamer;
@@ -201,6 +206,7 @@ void Viewer::reload(bool clamp) {
 }
 
 void Viewer::open(QString new_file) {
+	save_state();
 	res->set_file(new_file);
 	QFileInfo info(new_file);
 
@@ -512,6 +518,78 @@ SearchBar *Viewer::get_search_bar() const {
 
 BeamerWindow *Viewer::get_beamer() const {
 	return beamer;
+}
+
+void Viewer::save_state() {
+	if (!res || !canvas || !res->is_valid() || res->get_file().isEmpty()) {
+		return;
+	}
+
+	QFileInfo info(res->get_file());
+	QString key = info.canonicalFilePath();
+	if (key.isEmpty()) {
+		key = info.absoluteFilePath();
+	}
+
+	QJsonObject state;
+	state[QString::fromUtf8("layout")] = canvas->get_layout_name();
+	state[QString::fromUtf8("page")] = canvas->get_layout()->get_page();
+	state[QString::fromUtf8("zoom")] = canvas->get_layout()->get_zoom();
+
+	QJsonArray jumplist_arr;
+	for (int p : res->get_jumplist()) {
+		jumplist_arr.append(p);
+	}
+	state[QString::fromUtf8("jumplist")] = jumplist_arr;
+
+	StateFile::save_state(key, state);
+}
+
+void Viewer::load_state() {
+	if (!res || !canvas || !res->is_valid() || res->get_file().isEmpty()) {
+		return;
+	}
+
+	QFileInfo info(res->get_file());
+	QString key = info.canonicalFilePath();
+	if (key.isEmpty()) {
+		key = info.absoluteFilePath();
+	}
+
+	QJsonObject state = StateFile::load_state(key);
+	if (state.isEmpty()) {
+		return;
+	}
+
+	// Restore layout mode
+	QString layout_name = state[QString::fromUtf8("layout")].toString();
+	if (!layout_name.isEmpty()) {
+		canvas->set_layout_by_name(layout_name);
+	}
+
+	// Restore zoom (meaningful for grid layout; no-op for others)
+	if (state.contains(QString::fromUtf8("zoom"))) {
+		int zoom = state[QString::fromUtf8("zoom")].toInt();
+		canvas->get_layout()->set_zoom(zoom, false);
+	}
+
+	// Restore jump list
+	QJsonArray jumplist_arr = state[QString::fromUtf8("jumplist")].toArray();
+	if (!jumplist_arr.isEmpty()) {
+		std::list<int> jumplist;
+		for (const QJsonValue &v : jumplist_arr) {
+			jumplist.push_back(v.toInt());
+		}
+		res->set_jumplist(jumplist);
+	}
+
+	// Restore page — only if the user did not explicitly pass --page
+	if (!CFG::get_instance()->get_tmp_value("start_page_set").toBool()) {
+		if (state.contains(QString::fromUtf8("page"))) {
+			CFG::get_instance()->set_tmp_value("start_page",
+				state[QString::fromUtf8("page")].toInt());
+		}
+	}
 }
 
 void Viewer::layout_updated(int new_page, bool page_changed) {

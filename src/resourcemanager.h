@@ -76,6 +76,8 @@ public:
 	void clear_jumps();
 	int jump_back();
 	int jump_forward();
+	std::list<int> get_jumplist() const;
+	void set_jumplist(const std::list<int> &list);
 
 	std::unique_ptr<Poppler::LinkDestination> resolve_link_destination(const QString &name) const;
 

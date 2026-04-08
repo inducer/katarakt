@@ -36,13 +36,13 @@ QMAKE_CXXFLAGS_DEBUG += -DDEBUG
 HEADERS += src/layout/layout.h src/layout/singlelayout.h src/layout/gridlayout.h src/layout/presenterlayout.h \
            src/viewer.h src/canvas.h src/resourcemanager.h src/grid.h src/search.h src/gotoline.h src/config.h \
            src/download.h src/util.h src/kpage.h src/worker.h src/beamerwindow.h src/toc.h src/splitter.h src/selection.h \
-           src/dbus/source_correlate.h src/dbus/dbus.h
+           src/dbus/source_correlate.h src/dbus/dbus.h src/statefile.h
 
 SOURCES += src/main.cpp \
            src/layout/layout.cpp src/layout/singlelayout.cpp src/layout/gridlayout.cpp src/layout/presenterlayout.cpp \
            src/viewer.cpp src/canvas.cpp src/resourcemanager.cpp src/grid.cpp src/search.cpp src/gotoline.cpp src/config.cpp \
            src/download.cpp src/util.cpp src/kpage.cpp src/worker.cpp src/beamerwindow.cpp src/toc.cpp src/splitter.cpp \
-           src/selection.cpp src/dbus/source_correlate.cpp src/dbus/dbus.cpp
+           src/selection.cpp src/dbus/source_correlate.cpp src/dbus/dbus.cpp src/statefile.cpp
 
 documentation.target = doc/katarakt.1
 documentation.depends = doc/katarakt.txt

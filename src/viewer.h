@@ -89,6 +89,8 @@ private slots:
 private:
 	void update_info_widget();
 	void setup_keys(QWidget *base);
+	void save_state();
+	void load_state();
 
 	ResourceManager *res;
 	Splitter *splitter;

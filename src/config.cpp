@@ -131,6 +131,7 @@ void CFG::init_defaults() {
 
 	// tmp values
 	tmp_values[QString::fromUtf8("start_page")] = 0;
+	tmp_values[QString::fromUtf8("start_page_set")] = false;
 	tmp_values[QString::fromUtf8("fullscreen")] = false;
 }
 

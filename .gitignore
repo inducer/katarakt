@@ -3,6 +3,8 @@ katarakt
 .*.swp
 *~
 moc_*.cpp
+moc_predefs.h
 Makefile
+.qmake.stash
 *.1
 *.html

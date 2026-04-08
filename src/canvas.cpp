@@ -165,6 +165,30 @@ Layout *Canvas::get_layout() const {
 	return cur_layout;
 }
 
+QString Canvas::get_layout_name() const {
+	if (cur_layout == grid_layout) {
+		return QString::fromUtf8("grid");
+	} else if (cur_layout == presenter_layout) {
+		return QString::fromUtf8("presenter");
+	} else {
+		return QString::fromUtf8("single");
+	}
+}
+
+void Canvas::set_layout_by_name(const QString &name) {
+	if (name == QString::fromUtf8("grid")) {
+		set_grid_layout();
+	} else if (name == QString::fromUtf8("presenter")) {
+		set_presenter_layout();
+	} else {
+		if (name != QString::fromUtf8("single")) {
+			cerr << "unknown layout name '" << name.toUtf8().constData()
+			     << "', using single layout" << endl;
+		}
+		set_single_layout();
+	}
+}
+
 void Canvas::update_page_overlay() {
 	QString frozen_text;
 	if (viewer->get_beamer()->is_frozen()) {

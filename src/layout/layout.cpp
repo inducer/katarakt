@@ -50,6 +50,10 @@ int Layout::get_page() const {
 	return page;
 }
 
+int Layout::get_zoom() const {
+	return 0;
+}
+
 void Layout::activate(const Layout *old_layout) {
 	page = old_layout->get_page();
 	width = old_layout->width;
